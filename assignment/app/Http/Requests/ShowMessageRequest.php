@@ -23,7 +23,7 @@ class ShowMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => ['required', 'string', new CorrectDecryptionPasswordRule]
+            'password' => ['required', 'string', new CorrectDecryptionPasswordRule],
         ];
     }
 }

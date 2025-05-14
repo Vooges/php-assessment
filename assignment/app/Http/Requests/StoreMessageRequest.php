@@ -25,7 +25,9 @@ class StoreMessageRequest extends FormRequest
             'contents' => 'required|string',
             'recipient_id' => 'nullable|integer|exists:recipients,id',
             'name' => 'nullable|string',
-            'email_address' => 'nullable|email'
+            'email_address' => 'nullable|email',
+            'delete_after_read' => 'nullable|boolean',
+            'expire_in_hours' => 'nullable|integer'
         ];
     }
 
@@ -36,12 +38,19 @@ class StoreMessageRequest extends FormRequest
             $hasName = $this->filled('name');
             $hasEmail = $this->filled('email_address');
 
-            if ($hasRecipientId && ($hasName || $hasEmail)) {
+            if ($hasRecipientId && ($hasName || $hasEmail)){
                 $validator->errors()->add('recipient_id', 'Provide either a colleague or a name and an email_address, not both.');
             }
 
-            if (!$hasRecipientId && (!$hasName || !$hasEmail)) {
+            if (!$hasRecipientId && (!$hasName || !$hasEmail)){
                 $validator->errors()->add('recipient_id', 'You must provide either a colleague or a name and an email_address.');
+            }
+
+            $hasDeleteAfterRead = $this->filled('delete_after_read');
+            $hasExpireInHours = $this->filled('expire_in_hours');
+
+            if (!$hasDeleteAfterRead && !$hasExpireInHours){
+                $validator->errors()->add('expire_in_hours', 'Either set the expire in hours or select the delete message after read checkbox.');
             }
         });
     }
