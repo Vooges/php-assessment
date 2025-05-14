@@ -69,11 +69,41 @@ class MessageControllerTest extends TestCase
         $response->assertInvalid(['contents', 'recipient_id']);
     }
 
-    public function test_store_message_success() : void
+    public function test_store_message_failed_validation_no_recipient_info() : void
+    {
+        // * Missing `recipient_id` or `name` and `email_address`.
+        $response = $this->post('/send', ['contents' => 'Test']);
+
+        $response->assertInvalid(['recipient_id']);
+    }
+
+    public function test_store_message_failed_validation_both_recipient_options() : void
+    {
+        // * `recipient_id`, `name` and `email_address` are provided.
+        $response = $this->post('/send', ['contents' => 'Test', 'recipient_id' => $this->recipient->id, 'name' => 'Test', 'email_address' => 'test@example.org']);
+
+        $response->assertInvalid(['recipient_id']);
+    }
+
+
+    public function test_store_message_with_recipient_id_success() : void
     {
         $beforeCount = Message::count();
 
         $response = $this->post('/send', ['contents' => 'Test contents', 'recipient_id' => $this->recipient->id]);
+        
+        $currentCount = Message::count();
+
+        $response->assertOk();
+        $response->assertSee('Bericht verstuurd');
+        $this->assertTrue($currentCount > $beforeCount);
+    }
+
+    public function test_store_message_other_success() : void
+    {
+        $beforeCount = Message::count();
+
+        $response = $this->post('/send', ['contents' => 'Test contents', 'name' => 'Test User', 'email_address' => 'test@example.org']);
         
         $currentCount = Message::count();
 
