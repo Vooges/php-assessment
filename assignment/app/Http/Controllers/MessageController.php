@@ -31,12 +31,26 @@ class MessageController extends Controller
     {
         $validated = $request->validated();
 
+        $recipientId = isset($validated['recipient_id']) ? $validated['recipient_id'] : null;
+
+        if ($recipientId === null){
+            $recipient = Recipient::firstOrCreate(
+                ['email_address' => $validated['email_address']],
+                [
+                    'name' => $validated['name'],
+                    'email_address' => $validated['email_address']
+                ]
+            );
+
+            $recipientId = $recipient->id;
+        }
+
         $encryptionResult = MessageEncryptionService::encrypt($validated['contents']);
         $password = Str::password();
 
         $message = Message::create([
             'contents' => $encryptionResult,
-            'recipient_id' => $validated['recipient_id'],
+            'recipient_id' => $recipientId,
             'password' => password_hash($password, null)
         ]);
 

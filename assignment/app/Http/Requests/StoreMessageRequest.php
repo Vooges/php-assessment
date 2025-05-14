@@ -23,7 +23,26 @@ class StoreMessageRequest extends FormRequest
     {
         return [
             'contents' => 'required|string',
-            'recipient_id' => 'required|integer|exists:recipients,id'
+            'recipient_id' => 'nullable|integer|exists:recipients,id',
+            'name' => 'nullable|string',
+            'email_address' => 'nullable|email'
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $hasRecipientId = $this->filled('recipient_id');
+            $hasName = $this->filled('name');
+            $hasEmail = $this->filled('email_address');
+
+            if ($hasRecipientId && ($hasName || $hasEmail)) {
+                $validator->errors()->add('recipient_id', 'Provide either a colleague or a name and an email_address, not both.');
+            }
+
+            if (!$hasRecipientId && (!$hasName || !$hasEmail)) {
+                $validator->errors()->add('recipient_id', 'You must provide either a colleague or a name and an email_address.');
+            }
+        });
     }
 }
