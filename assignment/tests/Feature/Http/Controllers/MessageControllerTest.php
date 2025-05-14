@@ -152,4 +152,16 @@ class MessageControllerTest extends TestCase
         $response->assertOk();
         $response->assertSee(self::$messageContents);
     }
+
+    public function test_show_correct_password_delete_after_read() : void
+    {
+        $messageUrl = url("/{$this->message->id}/decrypted");
+
+        $response = $this->post($messageUrl, ['password' => self::$password, 'delete' => true]);
+        $response->assertOk();
+        $response->assertSee(self::$messageContents);
+
+        $deletedResponse = $this->post($messageUrl);
+        $deletedResponse->assertNotFound();
+    }
 }
