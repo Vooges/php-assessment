@@ -65,6 +65,8 @@ class MessageController extends Controller
     public function protectedShow(Message $message)
     {
         if (now()->gte($message->expires_at)){
+            $message->delete();
+
             return view('expired');
         }
 
@@ -78,7 +80,13 @@ class MessageController extends Controller
      */
     public function show(Message $message, ShowMessageRequest $request)
     {
+        $validated = $request->validated();
+
         $message->contents = MessageEncryptionService::decrypt($message->contents);
+
+        if (isset($validated['delete']) && $validated['delete']){
+            $message->delete();
+        }
 
         return view('show', ['message' => $message]);
     }
