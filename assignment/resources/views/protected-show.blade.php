@@ -20,10 +20,7 @@
             </div>
         </div>
         <div class="py-12">
-            <h2 class="text-2xl font-bold">Verstuur een bericht</h2>
-            <p class="mt-2 text-lg text-gray-600">Er gaat niets boven de veiligheid van de data waarmee we werken. Op
-                deze pagina kun je een versleuteld bericht sturen. Zo kun je veilig wachtwoorden, code of andere
-                berichten delen.</p>
+            <h2 class="text-2xl font-bold">Bericht vergrendeld</h2>
             <div class="mt-8 max-w-md">
                 <div class="grid grid-cols-1 gap-6">
                     @if($errors->any())
@@ -35,22 +32,14 @@
                             </ul>
                         </div>
                     @endif
-                    <form action="/send" method="POST">
+                    <form action="{{ $decryptedMessageUrl }}" method="POST">
                         @csrf
                         <label class="block">
-                            <span class="text-gray-700">Selecteer een collega</span>
-                            <select class="block w-full mt-1" name="recipient_id">
-                                @foreach ($colleagues as $colleague)
-                                    <option value="{{ $colleague->id }}">{{ $colleague->name }}</option>
-                                @endforeach
-                            </select>
-                        </label>
-                        <label class="block">
-                            <span class="text-gray-700">Bericht</span>
-                            <textarea class="mt-1 block w-full" rows="5" placeholder="Plaats hier je bericht*" name="contents"></textarea>
+                            <span class="text-gray-700">Wachtwoord</span>
+                            <input type="password" class="mt-1 block w-full" rows="5" placeholder="Wachtwoord*" name="password"/>
                         </label>
                         <button class="mt-4 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Versleutel bericht
+                            Ontgrendel bericht
                         </button>
                     </form>
                 </div>
