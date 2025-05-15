@@ -38,6 +38,10 @@
                             <span class="text-gray-700">Wachtwoord</span>
                             <input type="password" class="mt-1 block w-full" rows="5" placeholder="Wachtwoord*" name="password"/>
                         </label>
+                        <label class="block">
+                            <span>Verwijder na lezen</span>
+                            <input type="checkbox" name="delete" value="1"/>
+                        </label>
                         <button class="mt-4 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Ontgrendel bericht
                         </button>
