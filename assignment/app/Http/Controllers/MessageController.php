@@ -47,11 +47,15 @@ class MessageController extends Controller
 
         $encryptionResult = MessageEncryptionService::encrypt($validated['contents']);
         $password = Str::password();
+        $expiryTimestamp = isset($validated['expire_in_hours']) ? (now())->addHours((int) $validated['expire_in_hours']) : null;
+        $deleteAfterRead = isset($validated['delete_after_read']) ? $validated['delete_after_read'] : false;
 
         $message = Message::create([
             'contents' => $encryptionResult,
             'recipient_id' => $recipientId,
-            'password' => password_hash($password, null)
+            'password' => password_hash($password, null),
+            'expires_at' => $expiryTimestamp,
+            'delete_after_read' => $deleteAfterRead
         ]);
 
         $messageUrl = url("/{$message->id}");
@@ -64,7 +68,7 @@ class MessageController extends Controller
      */
     public function protectedShow(Message $message)
     {
-        if (now()->gte($message->expires_at)){
+        if ($message->expires_at !== null && now()->gte($message->expires_at)){
             $message->delete();
 
             return view('expired');
@@ -84,7 +88,7 @@ class MessageController extends Controller
 
         $message->contents = MessageEncryptionService::decrypt($message->contents);
 
-        if (isset($validated['delete']) && $validated['delete']){
+        if ($message->delete_after_read){
             $message->delete();
         }
 

@@ -33,7 +33,9 @@ class MessageControllerTest extends TestCase
         $this->message = Message::create([
             'contents' => $encryptionResult,
             'recipient_id' => $this->recipient->id,
-            'password' => password_hash(self::$password, null)
+            'password' => password_hash(self::$password, null),
+            'expires_at' => null,
+            'delete_after_read' => false
         ]);
     }
 
@@ -85,12 +87,20 @@ class MessageControllerTest extends TestCase
         $response->assertInvalid(['recipient_id']);
     }
 
+    public function test_store_message_failed_validation_no_deletion_provided() : void
+    {
+        // * Both `expire_in_hours` and `delete_after_read` are omitted.
+        $response = $this->post('/send', ['contents' => 'Test', 'recipient_id' => $this->recipient->id]);
+
+        $response->assertInvalid(['expire_in_hours']);
+    }
+
 
     public function test_store_message_with_recipient_id_success() : void
     {
         $beforeCount = Message::count();
 
-        $response = $this->post('/send', ['contents' => 'Test contents', 'recipient_id' => $this->recipient->id]);
+        $response = $this->post('/send', ['contents' => 'Test contents', 'recipient_id' => $this->recipient->id, 'expire_in_hours' => 1]);
         
         $currentCount = Message::count();
 
@@ -103,13 +113,23 @@ class MessageControllerTest extends TestCase
     {
         $beforeCount = Message::count();
 
-        $response = $this->post('/send', ['contents' => 'Test contents', 'name' => 'Test User', 'email_address' => 'test@example.org']);
+        $response = $this->post('/send', ['contents' => 'Test contents', 'name' => 'Test User', 'email_address' => 'test@example.org', 'delete_after_read' => true]);
         
         $currentCount = Message::count();
 
         $response->assertOk();
         $response->assertSee('Bericht verstuurd');
         $this->assertTrue($currentCount > $beforeCount);
+    }
+
+    public function test_store_message_with_expire_in_hours() : void
+    {
+        $response = $this->post('/send', ['contents' => 'Test contents', 'recipient_id' => $this->recipient->id, 'expire_in_hours' => 1]);
+
+        $message = Message::orderBy('id', 'desc')->first();
+
+        $response->assertOk();
+        $this->assertTrue($message->expires_at !== null);
     }
 
     public function test_protected_show_expired_message() : void
@@ -155,13 +175,16 @@ class MessageControllerTest extends TestCase
 
     public function test_show_correct_password_delete_after_read() : void
     {
+        $this->message->delete_after_read = true;
+        $this->message->save();
+
         $messageUrl = url("/{$this->message->id}/decrypted");
 
-        $response = $this->post($messageUrl, ['password' => self::$password, 'delete' => true]);
+        $response = $this->post($messageUrl, ['password' => self::$password]);
         $response->assertOk();
         $response->assertSee(self::$messageContents);
 
-        $deletedResponse = $this->post($messageUrl);
+        $deletedResponse = $this->post($messageUrl, ['password' => self::$password]);
         $deletedResponse->assertNotFound();
     }
 }

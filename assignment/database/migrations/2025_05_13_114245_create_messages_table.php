@@ -16,7 +16,8 @@ return new class extends Migration
             $table->longText('contents');
             $table->foreignId('recipient_id');
             $table->string('password');
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->nullable();
+            $table->boolean('delete_after_read');
             $table->timestamps();
 
             $table->foreign('recipient_id')->references('id')->on('recipients');

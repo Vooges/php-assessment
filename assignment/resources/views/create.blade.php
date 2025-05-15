@@ -53,6 +53,7 @@
                                 <p>Of</p>
                             </div>
                             <div class="grow">
+                                <p>Voer handmatig de contactgegevens in:</p>
                                 <label class="block">
                                     <span class="text-gray-700">Naam</span>
                                     <input class="block w-full mt-1" name="name" type="text" placeholder="Naam"/>
@@ -66,6 +67,15 @@
                         <label class="block">
                             <span class="text-gray-700">Bericht</span>
                             <textarea class="mt-1 block w-full" rows="5" placeholder="Plaats hier je bericht*" name="contents"></textarea>
+                        </label>
+                        <label class="flex gap-1">
+                            <span class="text-gray-700">(Optioneel) Verwijder automatisch na </span>
+                            <input class="block max-w-20 mt-1" name="expire_in_hours" type="number" placeholder="1"/>
+                            <span class="text-gray-700"> uur</span>
+                        </label>
+                        <label class="block grow">
+                            <input type="checkbox" name="delete_after_read" value="1"/>
+                            <span>Verwijder na lezen</span>
                         </label>
                         <button class="mt-4 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Versleutel bericht

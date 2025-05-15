@@ -24,7 +24,6 @@ class ShowMessageRequest extends FormRequest
     {
         return [
             'password' => ['required', 'string', new CorrectDecryptionPasswordRule],
-            'delete' => 'nullable|boolean'
         ];
     }
 }
