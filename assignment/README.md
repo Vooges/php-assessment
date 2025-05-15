@@ -26,6 +26,11 @@ You can use your favourite stack (Docker, Mamp, Homestead). Or just run:
 php artisan serve
 ```
 
+# Syncing colleagues via the API
+
+Colleagues can be retrieved via the [api](https://pastebin.com/raw/uDzdKzGG), 
+this can be done by running the following command: `php artisan schedule:run`.
+
 # Run Tests
 
 ```bash
